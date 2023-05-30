@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  athena-mysql-udf
+
+  Sample SAM Template for athena-mysql-udf
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Conditions:
+  HasPermissionsBoundary: !Not [ !Equals [ !Ref PermissionsBoundaryARN, "" ] ]
+
+Parameters:
+  LambdaFunctionName:
+    Description: 'The name you will give to Lambda function which executes your UDFs. This name must satisfy the pattern ^[a-z0-9-_]{1,64}$'
+    Type: String
+    Default: 'athena-mysql-udf'
+    AllowedPattern: ^[a-z0-9-_]{1,64}$
+  LambdaTimeout:
+    Description: 'Maximum Lambda invocation runtime in seconds. (min 1 - 900 max)'
+    Default: '900'
+    Type: Number
+  LambdaMemory:
+    Description: 'Lambda memory in MB (min 128 - 3008 max).'
+    Default: '3008'
+    Type: Number
+    MinValue: '128'
+    MaxValue: '10240'
+  PermissionsBoundaryARN:
+    Description: "(Optional) An IAM policy ARN to use as the PermissionsBoundary for the created Lambda function's execution role"
+    Default: ''
+    Type: String
+
+Resources:
+  ConnectorFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: !Ref LambdaFunctionName
+      CodeUri: athena_mysql_udf/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Architectures:
+        - arm64
+      Timeout: !Ref LambdaTimeout
+      MemorySize: !Ref LambdaMemory
+      PermissionsBoundary: !If [ HasPermissionsBoundary, !Ref PermissionsBoundaryARN, !Ref "AWS::NoValue" ]
+
+Outputs:
+  ConnectorFunction:
+    Description: "ConnectorFunction Lambda Function ARN"
+    Value: !GetAtt ConnectorFunction.Arn
+  ConnectorFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt ConnectorFunctionRole.Arn
