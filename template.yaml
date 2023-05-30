@@ -59,5 +59,5 @@ Outputs:
     Description: "ConnectorFunction Lambda Function ARN"
     Value: !GetAtt ConnectorFunction.Arn
   ConnectorFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
+    Description: "Implicit IAM Role created for ConnectorFunction function"
     Value: !GetAtt ConnectorFunctionRole.Arn
