@@ -47,6 +47,12 @@ Resources:
       Timeout: !Ref LambdaTimeout
       MemorySize: !Ref LambdaMemory
       PermissionsBoundary: !If [ HasPermissionsBoundary, !Ref PermissionsBoundaryARN, !Ref "AWS::NoValue" ]
+  LambdaFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: ConnectorFunction
+    Properties:
+      RetentionInDays: 3
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref LambdaFunctionName]]
 
 Outputs:
   ConnectorFunction:
